@@ -171,13 +171,12 @@ def evaluate(test_sentences, classifier):
 def init_training_with_cross_validation(X_train, y_train, filename):
     t_ini = datetime.datetime.now()
     print('Training...')
-    lr_model = LogisticRegression(multi_class='auto', random_state=2, n_jobs=-1, verbose=1)
+    lr_model = LogisticRegression(multi_class='auto', random_state=2, n_jobs=-1, verbose=1, class_weight='balanced')
     skf = StratifiedKFold(n_splits=5)
     scores = ['accuracy', 'precision', 'precision', 'f1']
     params = [{
-    'penalty': ['l1', 'l2'], # l1 is Lasso, l2 is Ridge
     'C': [0.01, 0.1, 1.0, 10.0], # C is inverse of lambda
-    'solver': ['liblinear', 'lbfgs', 'newton-cg'] # liblinear is L1, lbfgs is L2
+    'solver': ['liblinear', 'lbfgs'] # liblinear is L1, lbfgs is L2
     }]
     print("# Estimator:",lr_model)
     for score in scores:

@@ -3,6 +3,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.linear_model import LogisticRegression
 from sklearn.svm import SVC
+from sklearn.naive_bayes import MultinomialNB
 from sklearn.feature_extraction import FeatureHasher
 from sklearn.metrics import classification_report
 from scipy.sparse import hstack
@@ -99,14 +100,12 @@ def form_data(tagged_sentences, include_y=True):
     if include_y:
         for sentence in tagged_sentences:
             for i, (word, tag) in enumerate(sentence):
-                # features = word_features([w for w, _ in sentence], i)
-                features = featuresTest([w for w, _ in sentence], i)
+                features = word_features([w for w, _ in sentence], i)
                 data.append((features, tag))
         return data
     else:
         for i, word in enumerate(tagged_sentences):
-            # features = word_features([w for w in tagged_sentences], i)
-            features = featuresTest([w for w in tagged_sentences], i)
+            features = word_features([w for w in tagged_sentences], i)
             data.append(features)
         return data 
 
@@ -214,9 +213,11 @@ def main():
     FILE_NAME = '../dataset/lr-model-ht1.pkl'
 
     # Logistic Regression Classifier
-    classifier = LogisticRegression(C=1, solver='liblinear', multi_class='auto', random_state=2, verbose=1, n_jobs=-1)
+    # classifier = LogisticRegression(C=1, solver='liblinear', multi_class='auto', random_state=2, verbose=1, n_jobs=-1)
     # Support Vector Classifier
     # classifier = SVC(C=1, kernel='linear', random_state=2)
+    # Naive Bayes Classifier
+    classifier = MultinomialNB(alpha=0.01)
 
     # Read the training data
     tagged_sentences = read_data(TRAIN_DATA)

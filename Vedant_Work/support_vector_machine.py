@@ -174,13 +174,13 @@ def init_training_with_cross_validation(X_train, y_train, filename):
     svm_model = SVC()
     skf = StratifiedKFold(n_splits=5)
     scores = ['accuracy', 'precision', 'precision', 'f1']
-    params = {
+    params = [{
     'kernel': ['linear', 'rbf', 'poly'],  # Kernel type
     'C': [0.01, 0.1, 1.0, 10.0],         # Regularization parameter
     'gamma': [0.1, 1.0, 'scale'],        # Kernel coefficient (for RBF kernel)
     'degree': [2, 3, 4],                 # Degree of the polynomial kernel
     'class_weight': [None, 'balanced'],  # Class weights (for imbalanced data)
-    }
+    }]
     print("# Estimator:",svm_model)
     for score in scores:
         print("# Tuning hyper-parameters for %s" % score)

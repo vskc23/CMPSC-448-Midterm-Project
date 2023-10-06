@@ -174,11 +174,11 @@ def init_training_with_cross_validation(X_train, y_train, filename):
     lr_model = LogisticRegression(multi_class='auto', random_state=2)
     skf = StratifiedKFold(n_splits=5)
     scores = ['accuracy', 'precision', 'precision', 'f1']
-    params = {
+    params = [{
     'penalty': ['l1', 'l2'], # l1 is Lasso, l2 is Ridge
     'C': [0.01, 0.1, 1.0, 10.0], # C is inverse of lambda
     'solver': ['liblinear', 'lbfgs', 'newton-cg'] # liblinear is L1, lbfgs is L2
-}
+    }]
     print("# Estimator:",lr_model)
     for score in scores:
         print("# Tuning hyper-parameters for %s" % score)

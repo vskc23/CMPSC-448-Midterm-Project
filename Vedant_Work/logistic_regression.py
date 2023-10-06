@@ -173,7 +173,7 @@ def init_training_with_cross_validation(X_train, y_train, filename):
     print('Training...')
     lr_model = LogisticRegression(multi_class='auto', random_state=2)
     skf = StratifiedKFold(n_splits=5)
-    scores = ['accuracy', 'precision_macro', 'recall_macro', 'f1_macro']
+    scores = ['accuracy', 'precision', 'precision', 'f1']
     params = {
     'penalty': ['l1', 'l2'], # l1 is Lasso, l2 is Ridge
     'C': [0.01, 0.1, 1.0, 10.0], # C is inverse of lambda
@@ -269,7 +269,7 @@ def main():
 
     correct_test_sen = read_data(TEST_LABELLED)
     test_sentences = read_data(TEST_DATAPATH, False)
-    
+
     predicted_data = predict_sentences(test_sentences, classifier)
     import test as t
     print("Accuracy on test set: ", t.compare_with_test_set(correct_test_sen,predicted_data))

@@ -274,7 +274,7 @@ def main():
     FILE_NAME = '../dataset/lr-model-ht1.pkl'
 
     # Logistic Regression Classifier
-    classifier = LogisticRegression(C=3, solver='liblinear', multi_class='auto', random_state=2)
+    classifier = LogisticRegression(C=1, solver='liblinear', multi_class='auto', random_state=2, verbose=1, n_jobs=-1)
     # Support Vector Classifier
     # classifier = SVC(C=1, kernel='linear', random_state=2)
 
@@ -306,14 +306,13 @@ def main():
     # Train a logistic regression model
     classifier.fit(X_combined_train, y_train)
 
-    # Hyperparameter tuning
-
+    # Hyperparameter tunin
     # classifier = init_training_with_cross_validation(X_combined_train, y_train, FILE_NAME)
 
     # load model
     # print('Loading model...')
-    with open(FILE_NAME, 'rb') as file:
-        classifier = pickle.load(file)
+    # with open(FILE_NAME, 'rb') as file:
+    #     classifier = pickle.load(file)
 
     # Evaluate the model on the test set    
     eval_test = read_data(VAL_DATA)
@@ -322,9 +321,7 @@ def main():
     # Test the model on the unlabelled set
     correct_test_sen = read_data(TEST_LABELLED)
     test_sentences = read_data(TEST_DATAPATH, False)
-    # correct_test_sen = read_data(VAL_DATA)
-    # test_sentences = read_data(VAL_DATA_UNLABELLED, False)
-    
+
     predicted_data = tag_sents(test_sentences, classifier)
     print("Accuracy on test set: ", compare_with_test_set(correct_test_sen,predicted_data))
 

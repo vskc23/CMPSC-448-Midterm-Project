@@ -173,7 +173,7 @@ def init_training_with_cross_validation(X_train, y_train, filename):
     print('Training...')
     svm_model = SVC()
     skf = StratifiedKFold(n_splits=5)
-    scores = ['accuracy', 'precision_macro', 'recall_macro', 'f1_macro']
+    scores = ['accuracy', 'precision', 'precision', 'f1']
     params = {
     'kernel': ['linear', 'rbf', 'poly'],  # Kernel type
     'C': [0.01, 0.1, 1.0, 10.0],         # Regularization parameter
@@ -266,13 +266,10 @@ def main():
     evaluate(test_data, classifier)
 
     # Predict on the unlabelled set
-    # test_sentences = read_data(TEST_DATAPATH, False)
-    # predicted_data = predict_sentences(test_sentences, classifier)
+    test_sentences = read_data(TEST_DATAPATH, False)
+    predicted_data = predict_sentences(test_sentences, classifier)
 
     correct_test_sen = read_data(TEST_LABELLED)
-    test_sentences = read_data(TEST_DATAPATH, False)
-    
-    predicted_data = predict_sentences(test_sentences, classifier)
     import test as t
     print("Accuracy on test set: ", t.compare_with_test_set(correct_test_sen,predicted_data))
 

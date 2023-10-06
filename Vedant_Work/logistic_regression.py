@@ -209,7 +209,7 @@ def main():
     VAL_DATA = "../dataset/val_labelled.txt"
     TEST_DATAPATH = "../dataset/test.txt"
     TEST_LABELLED = "../dataset/test_labelled.txt"
-    FILE_NAME = '../dataset/svm-pos.pkl'
+    FILE_NAME = '../dataset/lr-pos.pkl'
 
     # Initialize a logistic regression classifier
     # classifier = LogisticRegression(C=1, solver='liblinear', multi_class='auto', random_state=2)

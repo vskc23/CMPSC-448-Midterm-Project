@@ -171,7 +171,7 @@ def evaluate(test_sentences, classifier):
 def init_training_with_cross_validation(X_train, y_train, filename):
     t_ini = datetime.datetime.now()
     print('Training...')
-    lr_model = LogisticRegression(multi_class='auto', random_state=2)
+    lr_model = LogisticRegression(multi_class='auto', random_state=2, n_jobs=-1, verbose=1)
     skf = StratifiedKFold(n_splits=5)
     scores = ['accuracy', 'precision', 'precision', 'f1']
     params = [{

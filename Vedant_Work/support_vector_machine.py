@@ -2,6 +2,7 @@ import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.svm import SVC
+from sklearn.multiclass import OneVsRestClassifier
 from sklearn.feature_extraction import FeatureHasher
 from sklearn.metrics import classification_report
 from scipy.sparse import hstack
@@ -171,7 +172,7 @@ def evaluate(test_sentences, classifier):
 def init_training_with_cross_validation(X_train, y_train, filename):
     t_ini = datetime.datetime.now()
     print('Training...')
-    svm_model = SVC()
+    svm_model = OneVsRestClassifier(SVC(class_weight='balanced'), n_jobs=-1)
     skf = StratifiedKFold(n_splits=5)
     scores = ['accuracy', 'precision', 'precision', 'f1']
     params = [{

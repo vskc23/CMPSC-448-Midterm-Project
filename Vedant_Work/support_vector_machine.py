@@ -271,6 +271,7 @@ def main():
 
     correct_test_sen = read_data(TEST_LABELLED)
     test_sentences = read_data(TEST_DATAPATH, False)
+    
     predicted_data = predict_sentences(test_sentences, classifier)
     import test as t
     print("Accuracy on test set: ", t.compare_with_test_set(correct_test_sen,predicted_data))

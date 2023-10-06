@@ -64,6 +64,66 @@ def read_data(train_datapath,include_y=True):
     print("-> %d sentences are read from '%s'." % (len(sentences), train_datapath))
     return sentences
 
+import spacy
+
+# Load spaCy's English NLP model
+nlp = spacy.load('en_core_web_sm')
+
+def featuresTest(sentence, index):
+    # Convert list of words to a single string
+    text = ' '.join(sentence)
+
+    # Process the sentence with spaCy
+    doc = nlp(text)
+
+    word = doc[index]
+
+    # Basic features
+    features = {
+        'word': word.text,
+        'is_first': index == 0,
+        'is_last': index == len(sentence) - 1,
+        'is_capitalized': word.text.istitle(),
+        'is_all_caps': word.text.isupper(),
+        'is_all_lower': word.text.islower(),
+        'has_hyphen': '-' in word.text,
+        'is_numeric': word.text.isdigit(),
+        'capitals_inside': word.text[1:].lower() != word.text[1:]
+    }
+
+    # Morphological features
+    features.update({
+        'lemma': word.lemma_,
+        'shape': word.shape_,
+        'prefix': word.prefix_,
+        'suffix': word.suffix_,
+    })
+
+    # Syntactic features
+    if word.dep_:
+        features.update({
+            'dependency_relation': word.dep_,
+            'head_word': word.head.text,
+            'left_child_word': word.left_edge.text,
+            'right_child_word': word.right_edge.text,
+        })
+
+    # Check if index isn't out of bounds for previous and next words
+    if index > 0:
+        prev_word = doc[index-1]
+        features.update({
+            'prev_word': prev_word.text,
+            'prev_word_lemma': prev_word.lemma_,
+        })
+    if index < len(sentence) - 1:
+        next_word = doc[index+1]
+        features.update({
+            'next_word': next_word.text,
+            'next_word_lemma': next_word.lemma_,
+        })
+
+    return features
+
 # Define a function to extract custom features
 def word_features(sentence, index):
     word = sentence[index]
@@ -99,12 +159,14 @@ def form_data(tagged_sentences, include_y=True):
     if include_y:
         for sentence in tagged_sentences:
             for i, (word, tag) in enumerate(sentence):
-                features = word_features([w for w, _ in sentence], i)
+                # features = word_features([w for w, _ in sentence], i)
+                features = featuresTest([w for w, _ in sentence], i)
                 data.append((features, tag))
         return data
     else:
         for i, word in enumerate(tagged_sentences):
-            features = word_features([w for w in tagged_sentences], i)
+            # features = word_features([w for w in tagged_sentences], i)
+            features = featuresTest([w for w in tagged_sentences], i)
             data.append(features)
         return data 
 
@@ -258,10 +320,11 @@ def main():
     evaluate(eval_test, classifier)
 
     # Test the model on the unlabelled set
-    # correct_test_sen = read_data(TEST_LABELLED)
-    # test_sentences = read_data(TEST_DATAPATH, False)
-    correct_test_sen = read_data(VAL_DATA)
-    test_sentences = read_data(VAL_DATA_UNLABELLED, False)
+    correct_test_sen = read_data(TEST_LABELLED)
+    test_sentences = read_data(TEST_DATAPATH, False)
+    # correct_test_sen = read_data(VAL_DATA)
+    # test_sentences = read_data(VAL_DATA_UNLABELLED, False)
+    
     predicted_data = tag_sents(test_sentences, classifier)
     print("Accuracy on test set: ", compare_with_test_set(correct_test_sen,predicted_data))
 

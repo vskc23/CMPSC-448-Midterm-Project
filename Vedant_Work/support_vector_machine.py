@@ -174,7 +174,7 @@ def init_training_with_cross_validation(X_train, y_train, filename):
     print('Training...')
     svm_model = OneVsRestClassifier(SVC(class_weight='balanced'), n_jobs=-1)
     skf = StratifiedKFold(n_splits=5)
-    scores = ['accuracy', 'precision', 'precision', 'f1']
+    scores = ['accuracy','f1']
     params = [{
     'kernel': ['linear', 'rbf', 'poly'],  # Kernel type
     'C': [0.01, 0.1, 1.0, 10.0],         # Regularization parameter

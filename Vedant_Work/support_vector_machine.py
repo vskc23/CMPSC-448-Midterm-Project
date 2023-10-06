@@ -184,7 +184,7 @@ def init_training_with_cross_validation(X_train, y_train, filename):
     print("# Estimator:",svm_model)
     for score in scores:
         print("# Tuning hyper-parameters for %s" % score)
-        classifier = GridSearchCV(svm_model, svm_model, cv=skf, scoring='%s' % score)
+        classifier = GridSearchCV(svm_model, param_grid=params, cv=skf, scoring='%s' % score)
         print("Initializing training")
         classifier.fit(X_train, y_train)
         print("training complete")

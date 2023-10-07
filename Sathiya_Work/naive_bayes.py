@@ -66,28 +66,36 @@ def read_data(train_datapath,include_y=True):
 # Define a function to extract custom features
 def word_features(sentence, index):
     word = sentence[index]
+    prefix = lambda s, n: s[:n] if len(s) > n else s
+    suffix = lambda s, n: s[-n:] if len(s) > n else s
+
     return {
+        'nb_terms': len(sentence),
         'word': word,
         'is_first': index == 0,
         'is_last': index == len(sentence) - 1,
-        'prev_word': '' if index == 0 else sentence[index - 1],
-        'prev_word2': '' if index <= 1 else sentence[index - 2],
-        'prev_word3': '' if index <= 2 else sentence[index - 3],
-        'next_word': '' if index == len(sentence) - 1 else sentence[index + 1],
-        'next_word2': '' if index >= len(sentence) - 2 else sentence[index + 2],
-        'next-word3' : '' if index >= len(sentence) - 3 else sentence[index + 3],
-        'word_length': len(word),  # Custom feature: word length
-        'prefix-1': word[0],
-        'prefix-2': word[:2],
-        'prefix-3': word[:3],
-        'suffix-1': word[-1],
-        'suffix-2': word[-2:],
-        'suffix-3': word[-3:],
+        'is_capitalized': word[0].upper() == word[0] if word else False,
+        'is_all_caps': word.upper() == word if word else False,
+        'is_all_lower': word.lower() == word if word else False,
+          'prefix-1': prefix(word, 1),
+          'prefix-2': prefix(word, 2),
+          'prefix-3': prefix(word, 3),
+          'prefix-4': prefix(word, 4),
+          'prefix-5': prefix(word, 5),
+          'suffix-1': suffix(word, 1),
+          'suffix-2': suffix(word, 2),
+          'suffix-3': suffix(word, 3),
+          'suffix-4': suffix(word, 4),
+          'suffix-5': suffix(word, 5),
+          'i-1_prefix-3': prefix(sentence[index-1], 3) if index > 0 else '',
+          'i-1_suffix-3': suffix(sentence[index-1], 3) if index > 0 else '',
+          'i+1_prefix-3': prefix(sentence[index+1], 3) if index < len(sentence) - 1 else '',
+          'i+1_suffix-3': suffix(sentence[index+1], 3) if index < len(sentence) - 1 else '',
+        'prev_word': sentence[index - 1] if index > 0 else '',
+        'next_word': sentence[index + 1] if index < len(sentence) - 1 else '',
         'has_hyphen': '-' in word,
         'is_numeric': word.isdigit(),
-        'capitals_inside': word[1:].lower() != word[1:],
-        'is_capitalized': word[0].upper() == word[0],
-        'is_all_caps': word.upper() == word,
+        'capitals_inside': word[1:].lower() != word[1:]
     }
 
 def form_data(tagged_sentences, include_y=True):

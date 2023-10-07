@@ -207,7 +207,6 @@ def main():
   
     # define the path to the training data
     TRAIN_DATA = "../dataset/train.txt"
-    VAL_DATA = "../dataset/val_labelled.txt"
     TEST_DATAPATH = "../dataset/test.txt"
     FILE_NAME = '../dataset/svm-pos.pkl'
 
@@ -218,8 +217,8 @@ def main():
     tagged_sentences = read_data(TRAIN_DATA)
 
     # split the data into train and test
-    # train_data = tagged_sentences[:int(len(tagged_sentences)*0.8)]
-    # test_data = tagged_sentences[int(len(tagged_sentences)*0.8):]
+    train_data = tagged_sentences[:int(len(tagged_sentences)*0.8)]
+    test_data = tagged_sentences[int(len(tagged_sentences)*0.8):]
 
     # Form the training data
     train_data = form_data(tagged_sentences)
@@ -244,15 +243,15 @@ def main():
     X_combined_train = hstack([X_combined_train, X_train_text_hash])
 
     # Hyperparameter tuning
-    classifier = init_training_with_cross_validation(X_combined_train, y_train, FILE_NAME)
+    # classifier = init_training_with_cross_validation(X_combined_train, y_train, FILE_NAME)
 
     # Train a logistic regression model
-    # classifier.fit(X_combined_train, y_train)
+    classifier.fit(X_combined_train, y_train)
 
     # save model
-    # print('Saving model...')
-    # with open(FILE_NAME, 'wb') as file:
-    #    pickle.dump(classifier, file) 
+    print('Saving model...')
+    with open(FILE_NAME, 'wb') as file:
+       pickle.dump(classifier, file) 
 
     # load model
     print('Loading model...')
@@ -260,16 +259,14 @@ def main():
         classifier = pickle.load(file)
 
     # Evaluate the model on the test set    
-    test_data = read_data(VAL_DATA)
     evaluate(test_data, classifier)
 
     # Predict on the unlabelled set
     test_sentences = read_data(TEST_DATAPATH, False)
     predicted_data = predict_sentences(test_sentences, classifier)
 
-
     # Write the tagged sentences to a file
-    # write_data(predicted_data, "../dataset/model_labelled.txt")
+    write_data(predicted_data, "../dataset/prediction-pioneers-svm.txt")
 
 if __name__ == '__main__':
     main()

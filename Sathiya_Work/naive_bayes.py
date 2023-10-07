@@ -121,16 +121,17 @@ def predict(sentence, classifier):
     test_sentence = [word.lower() for word in sentence]
     test_data = form_data(test_sentence, include_y=False)
     # Extract features using the dictionary vectorizer
-    X_test_custom = custom_vectorizer.transform(test_data)
+    #X_test_custom = custom_vectorizer.transform(test_data)
     # Extract TF-IDF features using TfidfVectorizer
     X_test_text = [" ".join(x) for x in test_data]
     X_test_tfidf = tfidf_vectorizer.transform(X_test_text)
+    X_test_count = count_vectorizer.transform(X_test_text)
     # Extract Hash features using HashingVectorizer
     X_test_text_hash = feature_hasher.transform(test_data)
     # Combine TF-IDF and custom features
-    X_combined_test = hstack([X_test_tfidf, X_test_custom])
+    X_combined_test = hstack([X_test_count, X_test_tfidf])
     # Combine TF-IDF, custom and count features
-    X_combined_test = hstack([X_combined_test, X_test_text_hash])
+    #X_combined_test = hstack([X_combined_test, X_test_text_hash])
     # Predict the tags
     preds = classifier.predict(X_combined_test) 
     # Combine the words with the predicted tags

@@ -151,16 +151,17 @@ def evaluate(test_sentences, classifier):
     # Extract features and labels from the dataset
     X_test, y_test = zip(*test_data)
     # Extract custom features using DictVectorizer
-    X_test_custom = custom_vectorizer.transform(X_test)
+    #X_test_custom = custom_vectorizer.transform(X_test)
     # Extract TF-IDF features using TfidfVectorizer
     X_test_text = [" ".join(x) for x in X_test]
     X_test_tfidf = tfidf_vectorizer.transform(X_test_text)
+    X_test_count = count_vectorizer.transform(X_test_text)
     # Extract Hash features using HashingVectorizer
     X_test_text_hash = feature_hasher.transform(X_test)
     # Combine TF-IDF and custom features
-    X_combined_test = hstack([X_test_tfidf, X_test_custom])
+    X_combined_test = hstack([X_test_count, X_test_tfidf])
     # Combine TF-IDF, custom and count features
-    X_combined_test = hstack([X_combined_test, X_test_text_hash])
+    #X_combined_test = hstack([X_combined_test, X_test_text_hash])
     # Predict the tags
     y_pred = classifier.predict(X_combined_test)
     # Print the classification report

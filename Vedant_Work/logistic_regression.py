@@ -171,9 +171,9 @@ def evaluate(test_sentences, classifier):
 def init_training_with_cross_validation(X_train, y_train, filename):
     t_ini = datetime.datetime.now()
     print('Training...')
-    lr_model = LogisticRegression(multi_class='auto', random_state=2, n_jobs=-1, verbose=1, class_weight='balanced')
+    lr_model = LogisticRegression(multi_class='auto', random_state=2, n_jobs=-1, verbose=1, max_iter=1000)
     skf = StratifiedKFold(n_splits=5)
-    scores = ['accuracy', 'f1']
+    scores = ['accuracy']
     params = [{
     'C': [0.01, 0.1, 1.0, 10.0], # C is inverse of lambda
     'solver': ['liblinear', 'lbfgs'] # liblinear is L1, lbfgs is L2
@@ -259,10 +259,12 @@ def main():
         classifier = pickle.load(file)
 
     # Evaluate the model on the test set    
+    print("Evaluating the model on the test set:")
     test_data = read_data(VAL_DATA)
     evaluate(test_data, classifier)
 
     # Predict on the unlabelled set
+    print("Predicting on the unlabelled set:")
     test_sentences = read_data(TEST_DATAPATH, False)
     predicted_data = predict_sentences(test_sentences, classifier)
 

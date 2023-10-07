@@ -3,7 +3,6 @@ from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.linear_model import LogisticRegression
 from sklearn.svm import SVC
-from sklearn.naive_bayes import MultinomialNB
 from sklearn.feature_extraction import FeatureHasher
 from sklearn.metrics import classification_report
 from scipy.sparse import hstack
@@ -213,11 +212,9 @@ def main():
     FILE_NAME = '../dataset/lr-model-ht1.pkl'
 
     # Logistic Regression Classifier
-    # classifier = LogisticRegression(C=1, solver='liblinear', multi_class='auto', random_state=2, verbose=1, n_jobs=-1)
+    classifier = LogisticRegression(C=1, solver='liblinear', multi_class='auto', random_state=2, verbose=1, n_jobs=-1)
     # Support Vector Classifier
     # classifier = SVC(C=1, kernel='linear', random_state=2)
-    # Naive Bayes Classifier
-    classifier = MultinomialNB(alpha=0.01)
 
     # Read the training data
     tagged_sentences = read_data(TRAIN_DATA)

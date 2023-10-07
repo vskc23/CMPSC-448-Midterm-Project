@@ -230,15 +230,15 @@ def main():
     # Extract TF-IDF features using TfidfVectorizer
     X_train_text = [" ".join(x) for x in X_train]  # Convert the list of words to sentences
     X_train_tfidf = tfidf_vectorizer.fit_transform(X_train_text)
-
+    X_train_count = count_vectorizer.fit_transform(X_train_text)
     # Extract Hash features using HashingVectorizer
-    X_train_text_hash = feature_hasher.transform(X_train)
+    #X_train_text_hash = feature_hasher.transform(X_train)
 
     # Combine TF-IDF and custom features
     #X_combined_train = hstack([X_train_tfidf, X_train_custom])
 
     # Combine TF-IDF, custom and Hash features
-    X_combined_train = hstack([X_train_text_hash, X_train_tfidf])
+    X_combined_train = hstack([X_train_count, X_train_tfidf])
 
     # Hyperparameter tuning
     # classifier = init_training_with_cross_validation(X_combined_train, y_train, FILE_NAME)

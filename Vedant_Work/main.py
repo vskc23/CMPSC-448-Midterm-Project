@@ -99,14 +99,12 @@ def form_data(tagged_sentences, include_y=True):
     if include_y:
         for sentence in tagged_sentences:
             for i, (word, tag) in enumerate(sentence):
-                # features = word_features([w for w, _ in sentence], i)
-                features = featuresTest([w for w, _ in sentence], i)
+                features = word_features([w for w, _ in sentence], i)
                 data.append((features, tag))
         return data
     else:
         for i, word in enumerate(tagged_sentences):
-            # features = word_features([w for w in tagged_sentences], i)
-            features = featuresTest([w for w in tagged_sentences], i)
+            features = word_features([w for w in tagged_sentences], i)
             data.append(features)
         return data 
 
@@ -208,13 +206,12 @@ def main():
     # define the path to the training data
     TRAIN_DATA = "../dataset/train.txt"
     VAL_DATA = "../dataset/val_labelled.txt"
-    VAL_DATA_UNLABELLED = "../dataset/val.txt"
     TEST_DATAPATH = "../dataset/test.txt"
     TEST_LABELLED = "../dataset/test_labelled.txt"
     FILE_NAME = '../dataset/lr-model-ht1.pkl'
 
     # Logistic Regression Classifier
-    classifier = LogisticRegression(C=1, solver='liblinear', multi_class='auto', random_state=2, verbose=1, n_jobs=-1)
+    classifier = LogisticRegression(C=1, solver='liblinear', max_iter=1000, multi_class='auto', random_state=2, verbose=1, n_jobs=-1)
     # Support Vector Classifier
     # classifier = SVC(C=1, kernel='linear', random_state=2)
 

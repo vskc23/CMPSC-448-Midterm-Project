@@ -171,13 +171,12 @@ def evaluate(test_sentences, classifier):
 def init_training_with_cross_validation(X_train, y_train, filename):
     t_ini = datetime.datetime.now()
     print('Training...')
-    lr_model = LogisticRegression(multi_class='auto', random_state=2, n_jobs=-1, verbose=1)
+    lr_model = LogisticRegression(multi_class='auto', random_state=2, n_jobs=-1, verbose=1, max_iter=1000)
     skf = StratifiedKFold(n_splits=5)
-    scores = ['accuracy', 'precision', 'precision', 'f1']
+    scores = ['accuracy']
     params = [{
-    'penalty': ['l1', 'l2'], # l1 is Lasso, l2 is Ridge
     'C': [0.01, 0.1, 1.0, 10.0], # C is inverse of lambda
-    'solver': ['liblinear', 'lbfgs', 'newton-cg'] # liblinear is L1, lbfgs is L2
+    'solver': ['liblinear', 'lbfgs'] # liblinear is L1, lbfgs is L2
     }]
     print("# Estimator:",lr_model)
     for score in scores:
@@ -206,20 +205,18 @@ def main():
   
     # define the path to the training data
     TRAIN_DATA = "../dataset/train.txt"
-    VAL_DATA = "../dataset/val_labelled.txt"
     TEST_DATAPATH = "../dataset/test.txt"
-    TEST_LABELLED = "../dataset/test_labelled.txt"
     FILE_NAME = '../dataset/lr-pos.pkl'
 
     # Initialize a logistic regression classifier
-    # classifier = LogisticRegression(C=1, solver='liblinear', multi_class='auto', random_state=2)
+    classifier = LogisticRegression(C=10, solver='liblinear', max_iter=1000, multi_class='auto', random_state=2, verbose=1, n_jobs=-1)
 
     # Read the training data
     tagged_sentences = read_data(TRAIN_DATA)
 
     # split the data into train and test
-    # train_data = tagged_sentences[:int(len(tagged_sentences)*0.8)]
-    # test_data = tagged_sentences[int(len(tagged_sentences)*0.8):]
+    train_data = tagged_sentences[:int(len(tagged_sentences)*0.8)]
+    test_data = tagged_sentences[int(len(tagged_sentences)*0.8):]
 
     # Form the training data
     train_data = form_data(tagged_sentences)
@@ -244,15 +241,15 @@ def main():
     X_combined_train = hstack([X_combined_train, X_train_text_hash])
 
     # Hyperparameter tuning
-    classifier = init_training_with_cross_validation(X_combined_train, y_train, FILE_NAME)
+    # classifier = init_training_with_cross_validation(X_combined_train, y_train, FILE_NAME)
 
     # Train a logistic regression model
-    # classifier.fit(X_combined_train, y_train)
+    classifier.fit(X_combined_train, y_train)
 
     # save model
-    # print('Saving model...')
-    # with open(FILE_NAME, 'wb') as file:
-    #    pickle.dump(classifier, file) 
+    print('Saving model...')
+    with open(FILE_NAME, 'wb') as file:
+       pickle.dump(classifier, file) 
 
     # load model
     print('Loading model...')
@@ -260,19 +257,16 @@ def main():
         classifier = pickle.load(file)
 
     # Evaluate the model on the test set    
-    test_data = read_data(VAL_DATA)
+    print("Evaluating the model on the test set:")
     evaluate(test_data, classifier)
 
     # Predict on the unlabelled set
+    print("Predicting on the unlabelled set:")
     test_sentences = read_data(TEST_DATAPATH, False)
     predicted_data = predict_sentences(test_sentences, classifier)
 
-    correct_test_sen = read_data(TEST_LABELLED)
-    import test as t
-    print("Accuracy on test set: ", t.compare_with_test_set(correct_test_sen,predicted_data))
-
     # Write the tagged sentences to a file
-    # write_data(predicted_data, "../dataset/model_labelled.txt")
+    write_data(predicted_data, "../dataset/prediction-pioneers-lr.txt")
 
 if __name__ == '__main__':
     main()

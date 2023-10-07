@@ -19,19 +19,6 @@ count_vectorizer = CountVectorizer()
 # Feature Hasher
 feature_hasher = FeatureHasher(input_type="dict")
 
-# get accuracy
-def compare_with_test_set(correct_set,predicted_data):
-    total = 0
-    correct = 0
-    for predicted_sentence, correct_sentence in zip(predicted_data, correct_set):
-        for predicted_word, correct_word in zip(predicted_sentence, correct_sentence):
-            total = total + 1
-            if predicted_word[1] == correct_word[1]:
-                correct = correct + 1
-
-    accuracy = (correct / total) * 100
-    return accuracy
-
 # read_data() function from LR/new.py
 def read_data(train_datapath,include_y=True):
     """Read sentences from given corpus data"""
@@ -172,17 +159,22 @@ def evaluate(test_sentences, classifier):
 def init_training_with_cross_validation(X_train, y_train, filename):
     t_ini = datetime.datetime.now()
     print('Training...')
-    svm_model = OneVsRestClassifier(SVC(class_weight='balanced'), n_jobs=-1)
+    
+    # Define the SVM model with balanced class weights
+    svm_model = SVC(class_weight='balanced')
+    
     skf = StratifiedKFold(n_splits=5)
-    scores = ['accuracy', 'precision', 'precision', 'f1']
+    scores = ['accuracy', 'f1']
+    
     params = [{
-    'kernel': ['linear', 'rbf', 'poly'],  # Kernel type
-    'C': [0.01, 0.1, 1.0, 10.0],         # Regularization parameter
-    'gamma': [0.1, 1.0, 'scale'],        # Kernel coefficient (for RBF kernel)
-    'degree': [2, 3, 4],                 # Degree of the polynomial kernel
-    'class_weight': [None, 'balanced'],  # Class weights (for imbalanced data)
+        'kernel': ['linear', 'rbf', 'poly'],  # Kernel type
+        'gamma': [0.1, 1.0, 'scale'],         # Kernel coefficient (for RBF kernel)
+        'degree': [2, 3, 4],                  # Degree of the polynomial kernel
+        #'class_weight': [None, 'balanced'],  # Class weights (for imbalanced data)
     }]
-    print("# Estimator:",svm_model)
+    
+    print("# Estimator:", svm_model)
+    
     for score in scores:
         print("# Tuning hyper-parameters for %s" % score)
         classifier = GridSearchCV(svm_model, param_grid=params, cv=skf, scoring='%s' % score)
@@ -192,37 +184,41 @@ def init_training_with_cross_validation(X_train, y_train, filename):
         print("Best parameters set found on development set:")
         print(classifier.best_params_)
         print("Grid scores on development set:")
+        
         means = classifier.cv_results_['mean_test_score']
         stds = classifier.cv_results_['std_test_score']
+        
         for mean, std, params in zip(means, stds, classifier.cv_results_['params']):
             print("%0.3f (+/-%0.03f) for %r" % (mean, std * 2, params))
+        
         # save model
         print('Saving model...')
         with open(filename, 'wb') as file:
             pickle.dump(classifier, file)
+    
     t_fin = datetime.datetime.now()
     print('Training completed in {} seconds'.format((t_fin - t_ini).total_seconds()))
+    
     return classifier
+
 
 # main function
 def main():
   
     # define the path to the training data
     TRAIN_DATA = "../dataset/train.txt"
-    VAL_DATA = "../dataset/val_labelled.txt"
     TEST_DATAPATH = "../dataset/test.txt"
-    TEST_LABELLED = "../dataset/test_labelled.txt"
     FILE_NAME = '../dataset/svm-pos.pkl'
 
     # Support Vector Classifier
-    # classifier = SVC(C=1, kernel='linear', random_state=2)
+    #classifier = SVC(C=1, kernel='linear', random_state=2)
 
     # Read the training data
     tagged_sentences = read_data(TRAIN_DATA)
 
     # split the data into train and test
-    # train_data = tagged_sentences[:int(len(tagged_sentences)*0.8)]
-    # test_data = tagged_sentences[int(len(tagged_sentences)*0.8):]
+    train_data = tagged_sentences[:int(len(tagged_sentences)*0.8)]
+    test_data = tagged_sentences[int(len(tagged_sentences)*0.8):]
 
     # Form the training data
     train_data = form_data(tagged_sentences)
@@ -247,15 +243,15 @@ def main():
     X_combined_train = hstack([X_combined_train, X_train_text_hash])
 
     # Hyperparameter tuning
-    classifier = init_training_with_cross_validation(X_combined_train, y_train, FILE_NAME)
+    # classifier = init_training_with_cross_validation(X_combined_train, y_train, FILE_NAME)
 
     # Train a logistic regression model
-    # classifier.fit(X_combined_train, y_train)
+    classifier.fit(X_combined_train, y_train)
 
     # save model
-    # print('Saving model...')
-    # with open(FILE_NAME, 'wb') as file:
-    #    pickle.dump(classifier, file) 
+    print('Saving model...')
+    with open(FILE_NAME, 'wb') as file:
+       pickle.dump(classifier, file) 
 
     # load model
     print('Loading model...')
@@ -263,19 +259,14 @@ def main():
         classifier = pickle.load(file)
 
     # Evaluate the model on the test set    
-    test_data = read_data(VAL_DATA)
     evaluate(test_data, classifier)
 
     # Predict on the unlabelled set
     test_sentences = read_data(TEST_DATAPATH, False)
     predicted_data = predict_sentences(test_sentences, classifier)
 
-    correct_test_sen = read_data(TEST_LABELLED)
-    import test as t
-    print("Accuracy on test set: ", t.compare_with_test_set(correct_test_sen,predicted_data))
-
     # Write the tagged sentences to a file
-    # write_data(predicted_data, "../dataset/model_labelled.txt")
+    write_data(predicted_data, "../dataset/prediction-pioneers-svm.txt")
 
 if __name__ == '__main__':
     main()
